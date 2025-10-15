@@ -20,10 +20,10 @@ func main() {
 
 	provideDB := db.GetDB()
 
-	// Auto-migrate appointment table
-	if err := database.Migrate(provideDB); err != nil {
-		log.Fatalf("Failed to migrate database: %v", err)
-	}
+	// // Auto-migrate appointment table
+	// if err := database.Migrate(provideDB); err != nil {
+	// 	log.Fatalf("Failed to migrate database: %v", err)
+	// }
 
 	// Create and initialize the app
 	a, err := app.New(provideDB)

@@ -8,7 +8,7 @@ import (
 	"github.com/beejay1293/schedule-management/backend/internal/models"
 	"github.com/beejay1293/schedule-management/backend/internal/repository"
 
-	pb "github.com/beejay1293/schedule-management/backend/internal/pb/proto"
+	pb "github.com/beejay1293/schedule-management/backend/internal/pb"
 	"github.com/google/uuid"
 )
 

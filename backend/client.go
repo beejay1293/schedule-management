@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	pb "schedule-management/backend/proto"
+	pb "github.com/beejay1293/schedule-management/backend/internal/pb"
 
 	"google.golang.org/grpc"
 )

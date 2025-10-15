@@ -2,7 +2,6 @@ package database
 
 import (
 	"os"
-	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -20,22 +19,12 @@ func ProvidePostgres() *gorm.DB {
 		// zerolog.Logger.Err(err).Msg("postgres database connection error")
 	}
 
-	// Optionally run migrations
-	if os.Getenv("RUN_DB_MIGRATIONS") == "true" {
-		if err := Migrate(gormdb); err != nil {
-			// zerolog.Fatal().Err(err).Msg("failed to run database migrations")
-		}
-	}
-
-	// Configure connection pool
-	sqlDB, err := gormdb.DB()
-	if err != nil {
-		// zerolog.Fatal().Err(err).Msg("failed to get sql.DB instance")
-	}
-
-	sqlDB.SetMaxOpenConns(25)
-	sqlDB.SetMaxIdleConns(10)
-	sqlDB.SetConnMaxLifetime(time.Hour)
+	// // Optionally run migrations
+	// if os.Getenv("RUN_DB_MIGRATIONS") == "true" {
+	// 	if err := Migrate(gormdb); err != nil {
+	// 		// zerolog.Fatal().Err(err).Msg("failed to run database migrations")
+	// 	}
+	// }
 
 	return gormdb
 }

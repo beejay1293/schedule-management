@@ -7,7 +7,7 @@ import (
 	"github.com/beejay1293/schedule-management/backend/internal/repository"
 	"github.com/beejay1293/schedule-management/backend/internal/service"
 
-	pb "github.com/beejay1293/schedule-management/backend/internal/pb/proto"
+	pb "github.com/beejay1293/schedule-management/backend/internal/pb"
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
 )
@@ -37,7 +37,6 @@ func New(database *gorm.DB) (*App, error) {
 
 	// --- Register gRPC services ---
 	pb.RegisterAppointmentServiceServer(grpcServer, appointmentSvc)
-	// pb.RegisterUserServiceServer(grpcServer, userSvc)
 
 	log.Println("All gRPC services registered")
 
