@@ -1,0 +1,34 @@
+syntax = "proto3";
+package appointment;
+option go_package = "github.com/beejay1293/schedule-management/backend/internal/pb;pb";
+
+message Appointment {
+  string id = 1;
+  string title = 2;
+  string date = 3;
+  string time = 4;
+}
+
+message CreateAppointmentRequest {
+  string title = 1;
+  string date = 2;
+  string time = 3;
+}
+
+message CreateAppointmentResponse {
+  Appointment appointment = 1;
+}
+
+message ListAppointmentsRequest {}
+message ListAppointmentsResponse {
+  repeated Appointment appointments = 1;
+}
+
+message DeleteAppointmentRequest { string id = 1; }
+message DeleteAppointmentResponse {}
+
+service AppointmentService {
+  rpc CreateAppointment(CreateAppointmentRequest) returns (CreateAppointmentResponse);
+  rpc ListAppointments(ListAppointmentsRequest) returns (ListAppointmentsResponse);
+  rpc DeleteAppointment(DeleteAppointmentRequest) returns (DeleteAppointmentResponse);
+}

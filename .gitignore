@@ -1,0 +1,19 @@
+# Go
+/bin/
+/pkg/
+/backend/vendor/
+/*.exe
+*.log
+
+# Go build
+*.test
+
+# Node
+/frontend/node_modules/
+dist/
+.env
+.vscode/
+
+# IDE
+.DS_Store
+.idea/

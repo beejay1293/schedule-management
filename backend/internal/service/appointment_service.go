@@ -1,0 +1,57 @@
+package service
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/beejay1293/schedule-management/backend/internal/models"
+	"github.com/beejay1293/schedule-management/backend/internal/repository"
+
+	pb "github.com/beejay1293/schedule-management/backend/internal/pb/proto"
+	"github.com/google/uuid"
+)
+
+type AppointmentService struct {
+	repo repository.AppointmentRepository
+	pb.UnimplementedAppointmentServiceServer
+}
+
+func NewAppointmentService(repo repository.AppointmentRepository) *AppointmentService {
+	return &AppointmentService{repo: repo}
+}
+
+func (s *AppointmentService) CreateAppointment(ctx context.Context, req *pb.CreateAppointmentRequest) (*pb.CreateAppointmentResponse, error) {
+	date, err := time.Parse("2006-01-02 15:04", fmt.Sprintf("%s %s", req.Date, req.Time))
+	if err != nil {
+		return nil, fmt.Errorf("invalid date/time format")
+	}
+
+	conflict, err := s.repo.ExistsAt(date)
+	if err != nil {
+		return nil, err
+	}
+
+	if conflict {
+		return nil, fmt.Errorf("conflict: another appointment exists at that time")
+	}
+
+	a := &models.Appointment{
+		ID:    uuid.New().String(),
+		Title: req.Title,
+		Date:  date,
+	}
+
+	if err := s.repo.Create(a); err != nil {
+		return nil, err
+	}
+
+	return &pb.CreateAppointmentResponse{
+		Appointment: &pb.Appointment{
+			Id:    a.ID,
+			Title: a.Title,
+			Date:  a.Date.Format("2006-01-02"),
+			Time:  a.Date.Format("15:04"),
+		},
+	}, nil
+}
