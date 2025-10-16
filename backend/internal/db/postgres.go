@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -21,9 +20,7 @@ func ProvidePostgres() *gorm.DB {
 		log.Fatalf("postgres database connection error: %v", err)
 	}
 
-	fmt.Println("run migration", os.Getenv("RUN_DB_MIGRATIONS"))
-
-	// // Optionally run migrations
+	// Optionally run migrations
 	if os.Getenv("RUN_DB_MIGRATIONS") == "true" {
 		if err := Migrate(gormdb); err != nil {
 			log.Fatalf("failed to run database migrations: %v", err)

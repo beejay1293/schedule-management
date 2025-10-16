@@ -14,7 +14,7 @@ func main() {
 	// Connect to Postgres
 	db, err := database.NewPostgresDB()
 	if err != nil {
-
+		log.Fatalf("Failed to connect to the database: %v", err)
 	}
 	defer db.Close()
 

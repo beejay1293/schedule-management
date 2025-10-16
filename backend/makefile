@@ -1,24 +1,23 @@
 MIGRATION_PATH=backend/internal/db/migrations
-DB_URL=postgres://postgres:password@localhost:5432/mydb?sslmode=disable
 
+.PHONY: create-migration gen-proto start-app
+
+# Create a new migration file
 create-migration:
+	@if [ -z "${name}" ]; then \
+		echo "Error: please provide a migration name (e.g. make create-migration name=add_appointments_table)"; \
+		exit 1; \
+	fi
 	migrate create -ext sql -dir ${MIGRATION_PATH} -seq ${name}
 
-migrate-up:
-	migrate -path ${MIGRATION_PATH} -database ${DB_URL} up
-
-migrate-down:
-	migrate -path ${MIGRATION_PATH} -database ${DB_URL} down
-
-.PHONY: gen-proto run-backend run-http
-
-gen-backend-proto:
+# Generate Go protobuf & gRPC files
+gen-proto:
 	protoc \
-		-I=backend/proto \
-		--go_out=backend/internal/pb --go_opt=paths=source_relative \
-		--go-grpc_out=backend/internal/pb --go-grpc_opt=paths=source_relative \
-		appointment.proto
+		-I=proto \
+		--go_out=internal/pb --go_opt=paths=source_relative \
+		--go-grpc_out=internal/pb --go-grpc_opt=paths=source_relative \
+		proto/appointment.proto
 
-run-backend:
+# Start the Go backend app
+start-app:
 	go run cmd/server/main.go
-
