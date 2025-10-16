@@ -21,6 +21,52 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type EventType int32
+
+const (
+	EventType_CREATED EventType = 0
+	EventType_DELETED EventType = 1
+)
+
+// Enum value maps for EventType.
+var (
+	EventType_name = map[int32]string{
+		0: "CREATED",
+		1: "DELETED",
+	}
+	EventType_value = map[string]int32{
+		"CREATED": 0,
+		"DELETED": 1,
+	}
+)
+
+func (x EventType) Enum() *EventType {
+	p := new(EventType)
+	*p = x
+	return p
+}
+
+func (x EventType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (EventType) Descriptor() protoreflect.EnumDescriptor {
+	return file_appointment_proto_enumTypes[0].Descriptor()
+}
+
+func (EventType) Type() protoreflect.EnumType {
+	return &file_appointment_proto_enumTypes[0]
+}
+
+func (x EventType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use EventType.Descriptor instead.
+func (EventType) EnumDescriptor() ([]byte, []int) {
+	return file_appointment_proto_rawDescGZIP(), []int{0}
+}
+
 type Appointment struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -409,6 +455,110 @@ func (x *SearchAppointmentsRequest) GetDate() string {
 	return ""
 }
 
+type AppointmentEvent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Type          EventType              `protobuf:"varint,1,opt,name=type,proto3,enum=appointment.EventType" json:"type,omitempty"`
+	Appointment   *Appointment           `protobuf:"bytes,2,opt,name=appointment,proto3" json:"appointment,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AppointmentEvent) Reset() {
+	*x = AppointmentEvent{}
+	mi := &file_appointment_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AppointmentEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AppointmentEvent) ProtoMessage() {}
+
+func (x *AppointmentEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_appointment_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AppointmentEvent.ProtoReflect.Descriptor instead.
+func (*AppointmentEvent) Descriptor() ([]byte, []int) {
+	return file_appointment_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *AppointmentEvent) GetType() EventType {
+	if x != nil {
+		return x.Type
+	}
+	return EventType_CREATED
+}
+
+func (x *AppointmentEvent) GetAppointment() *Appointment {
+	if x != nil {
+		return x.Appointment
+	}
+	return nil
+}
+
+type StreamAppointmentsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TitleFilter   string                 `protobuf:"bytes,1,opt,name=title_filter,json=titleFilter,proto3" json:"title_filter,omitempty"`
+	DateFilter    string                 `protobuf:"bytes,2,opt,name=date_filter,json=dateFilter,proto3" json:"date_filter,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamAppointmentsRequest) Reset() {
+	*x = StreamAppointmentsRequest{}
+	mi := &file_appointment_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamAppointmentsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamAppointmentsRequest) ProtoMessage() {}
+
+func (x *StreamAppointmentsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_appointment_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamAppointmentsRequest.ProtoReflect.Descriptor instead.
+func (*StreamAppointmentsRequest) Descriptor() ([]byte, []int) {
+	return file_appointment_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *StreamAppointmentsRequest) GetTitleFilter() string {
+	if x != nil {
+		return x.TitleFilter
+	}
+	return ""
+}
+
+func (x *StreamAppointmentsRequest) GetDateFilter() string {
+	if x != nil {
+		return x.DateFilter
+	}
+	return ""
+}
+
 var File_appointment_proto protoreflect.FileDescriptor
 
 const file_appointment_proto_rawDesc = "" +
@@ -433,12 +583,23 @@ const file_appointment_proto_rawDesc = "" +
 	"\x19DeleteAppointmentResponse\"E\n" +
 	"\x19SearchAppointmentsRequest\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x12\n" +
-	"\x04date\x18\x02 \x01(\tR\x04date2\xa2\x03\n" +
+	"\x04date\x18\x02 \x01(\tR\x04date\"z\n" +
+	"\x10AppointmentEvent\x12*\n" +
+	"\x04type\x18\x01 \x01(\x0e2\x16.appointment.EventTypeR\x04type\x12:\n" +
+	"\vappointment\x18\x02 \x01(\v2\x18.appointment.AppointmentR\vappointment\"_\n" +
+	"\x19StreamAppointmentsRequest\x12!\n" +
+	"\ftitle_filter\x18\x01 \x01(\tR\vtitleFilter\x12\x1f\n" +
+	"\vdate_filter\x18\x02 \x01(\tR\n" +
+	"dateFilter*%\n" +
+	"\tEventType\x12\v\n" +
+	"\aCREATED\x10\x00\x12\v\n" +
+	"\aDELETED\x10\x012\x81\x04\n" +
 	"\x12AppointmentService\x12b\n" +
 	"\x11CreateAppointment\x12%.appointment.CreateAppointmentRequest\x1a&.appointment.CreateAppointmentResponse\x12_\n" +
 	"\x10ListAppointments\x12$.appointment.ListAppointmentsRequest\x1a%.appointment.ListAppointmentsResponse\x12b\n" +
 	"\x11DeleteAppointment\x12%.appointment.DeleteAppointmentRequest\x1a&.appointment.DeleteAppointmentResponse\x12c\n" +
-	"\x12SearchAppointments\x12&.appointment.SearchAppointmentsRequest\x1a%.appointment.ListAppointmentsResponseBBZ@github.com/beejay1293/schedule-management/backend/internal/pb;pbb\x06proto3"
+	"\x12SearchAppointments\x12&.appointment.SearchAppointmentsRequest\x1a%.appointment.ListAppointmentsResponse\x12]\n" +
+	"\x12StreamAppointments\x12&.appointment.StreamAppointmentsRequest\x1a\x1d.appointment.AppointmentEvent0\x01BBZ@github.com/beejay1293/schedule-management/backend/internal/pb;pbb\x06proto3"
 
 var (
 	file_appointment_proto_rawDescOnce sync.Once
@@ -452,33 +613,41 @@ func file_appointment_proto_rawDescGZIP() []byte {
 	return file_appointment_proto_rawDescData
 }
 
-var file_appointment_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_appointment_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_appointment_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_appointment_proto_goTypes = []any{
-	(*Appointment)(nil),               // 0: appointment.Appointment
-	(*CreateAppointmentRequest)(nil),  // 1: appointment.CreateAppointmentRequest
-	(*CreateAppointmentResponse)(nil), // 2: appointment.CreateAppointmentResponse
-	(*ListAppointmentsRequest)(nil),   // 3: appointment.ListAppointmentsRequest
-	(*ListAppointmentsResponse)(nil),  // 4: appointment.ListAppointmentsResponse
-	(*DeleteAppointmentRequest)(nil),  // 5: appointment.DeleteAppointmentRequest
-	(*DeleteAppointmentResponse)(nil), // 6: appointment.DeleteAppointmentResponse
-	(*SearchAppointmentsRequest)(nil), // 7: appointment.SearchAppointmentsRequest
+	(EventType)(0),                    // 0: appointment.EventType
+	(*Appointment)(nil),               // 1: appointment.Appointment
+	(*CreateAppointmentRequest)(nil),  // 2: appointment.CreateAppointmentRequest
+	(*CreateAppointmentResponse)(nil), // 3: appointment.CreateAppointmentResponse
+	(*ListAppointmentsRequest)(nil),   // 4: appointment.ListAppointmentsRequest
+	(*ListAppointmentsResponse)(nil),  // 5: appointment.ListAppointmentsResponse
+	(*DeleteAppointmentRequest)(nil),  // 6: appointment.DeleteAppointmentRequest
+	(*DeleteAppointmentResponse)(nil), // 7: appointment.DeleteAppointmentResponse
+	(*SearchAppointmentsRequest)(nil), // 8: appointment.SearchAppointmentsRequest
+	(*AppointmentEvent)(nil),          // 9: appointment.AppointmentEvent
+	(*StreamAppointmentsRequest)(nil), // 10: appointment.StreamAppointmentsRequest
 }
 var file_appointment_proto_depIdxs = []int32{
-	0, // 0: appointment.CreateAppointmentResponse.appointment:type_name -> appointment.Appointment
-	0, // 1: appointment.ListAppointmentsResponse.appointments:type_name -> appointment.Appointment
-	1, // 2: appointment.AppointmentService.CreateAppointment:input_type -> appointment.CreateAppointmentRequest
-	3, // 3: appointment.AppointmentService.ListAppointments:input_type -> appointment.ListAppointmentsRequest
-	5, // 4: appointment.AppointmentService.DeleteAppointment:input_type -> appointment.DeleteAppointmentRequest
-	7, // 5: appointment.AppointmentService.SearchAppointments:input_type -> appointment.SearchAppointmentsRequest
-	2, // 6: appointment.AppointmentService.CreateAppointment:output_type -> appointment.CreateAppointmentResponse
-	4, // 7: appointment.AppointmentService.ListAppointments:output_type -> appointment.ListAppointmentsResponse
-	6, // 8: appointment.AppointmentService.DeleteAppointment:output_type -> appointment.DeleteAppointmentResponse
-	4, // 9: appointment.AppointmentService.SearchAppointments:output_type -> appointment.ListAppointmentsResponse
-	6, // [6:10] is the sub-list for method output_type
-	2, // [2:6] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	1,  // 0: appointment.CreateAppointmentResponse.appointment:type_name -> appointment.Appointment
+	1,  // 1: appointment.ListAppointmentsResponse.appointments:type_name -> appointment.Appointment
+	0,  // 2: appointment.AppointmentEvent.type:type_name -> appointment.EventType
+	1,  // 3: appointment.AppointmentEvent.appointment:type_name -> appointment.Appointment
+	2,  // 4: appointment.AppointmentService.CreateAppointment:input_type -> appointment.CreateAppointmentRequest
+	4,  // 5: appointment.AppointmentService.ListAppointments:input_type -> appointment.ListAppointmentsRequest
+	6,  // 6: appointment.AppointmentService.DeleteAppointment:input_type -> appointment.DeleteAppointmentRequest
+	8,  // 7: appointment.AppointmentService.SearchAppointments:input_type -> appointment.SearchAppointmentsRequest
+	10, // 8: appointment.AppointmentService.StreamAppointments:input_type -> appointment.StreamAppointmentsRequest
+	3,  // 9: appointment.AppointmentService.CreateAppointment:output_type -> appointment.CreateAppointmentResponse
+	5,  // 10: appointment.AppointmentService.ListAppointments:output_type -> appointment.ListAppointmentsResponse
+	7,  // 11: appointment.AppointmentService.DeleteAppointment:output_type -> appointment.DeleteAppointmentResponse
+	5,  // 12: appointment.AppointmentService.SearchAppointments:output_type -> appointment.ListAppointmentsResponse
+	9,  // 13: appointment.AppointmentService.StreamAppointments:output_type -> appointment.AppointmentEvent
+	9,  // [9:14] is the sub-list for method output_type
+	4,  // [4:9] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_appointment_proto_init() }
@@ -491,13 +660,14 @@ func file_appointment_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_appointment_proto_rawDesc), len(file_appointment_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   8,
+			NumEnums:      1,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_appointment_proto_goTypes,
 		DependencyIndexes: file_appointment_proto_depIdxs,
+		EnumInfos:         file_appointment_proto_enumTypes,
 		MessageInfos:      file_appointment_proto_msgTypes,
 	}.Build()
 	File_appointment_proto = out.File

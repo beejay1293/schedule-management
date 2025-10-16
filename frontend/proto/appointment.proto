@@ -41,9 +41,25 @@ message SearchAppointmentsRequest {
   string date = 2;   // optional: search by date YYYY-MM-DD
 }
 
+enum EventType {
+    CREATED = 0;
+    DELETED = 1;
+}
+
+message AppointmentEvent {
+  EventType type = 1;
+  Appointment appointment = 2;
+}
+
+message StreamAppointmentsRequest {
+  string title_filter = 1;
+  string date_filter = 2;
+}
+
 service AppointmentService {
   rpc CreateAppointment(CreateAppointmentRequest) returns (CreateAppointmentResponse);
   rpc ListAppointments(ListAppointmentsRequest) returns (ListAppointmentsResponse);
   rpc DeleteAppointment(DeleteAppointmentRequest) returns (DeleteAppointmentResponse);
   rpc SearchAppointments(SearchAppointmentsRequest) returns (ListAppointmentsResponse);
+  rpc StreamAppointments(StreamAppointmentsRequest) returns (stream AppointmentEvent);
 }

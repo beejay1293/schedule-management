@@ -23,6 +23,7 @@ const (
 	AppointmentService_ListAppointments_FullMethodName   = "/appointment.AppointmentService/ListAppointments"
 	AppointmentService_DeleteAppointment_FullMethodName  = "/appointment.AppointmentService/DeleteAppointment"
 	AppointmentService_SearchAppointments_FullMethodName = "/appointment.AppointmentService/SearchAppointments"
+	AppointmentService_StreamAppointments_FullMethodName = "/appointment.AppointmentService/StreamAppointments"
 )
 
 // AppointmentServiceClient is the client API for AppointmentService service.
@@ -32,8 +33,8 @@ type AppointmentServiceClient interface {
 	CreateAppointment(ctx context.Context, in *CreateAppointmentRequest, opts ...grpc.CallOption) (*CreateAppointmentResponse, error)
 	ListAppointments(ctx context.Context, in *ListAppointmentsRequest, opts ...grpc.CallOption) (*ListAppointmentsResponse, error)
 	DeleteAppointment(ctx context.Context, in *DeleteAppointmentRequest, opts ...grpc.CallOption) (*DeleteAppointmentResponse, error)
-	// New RPC for searching appointments
 	SearchAppointments(ctx context.Context, in *SearchAppointmentsRequest, opts ...grpc.CallOption) (*ListAppointmentsResponse, error)
+	StreamAppointments(ctx context.Context, in *StreamAppointmentsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[AppointmentEvent], error)
 }
 
 type appointmentServiceClient struct {
@@ -84,6 +85,25 @@ func (c *appointmentServiceClient) SearchAppointments(ctx context.Context, in *S
 	return out, nil
 }
 
+func (c *appointmentServiceClient) StreamAppointments(ctx context.Context, in *StreamAppointmentsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[AppointmentEvent], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &AppointmentService_ServiceDesc.Streams[0], AppointmentService_StreamAppointments_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[StreamAppointmentsRequest, AppointmentEvent]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type AppointmentService_StreamAppointmentsClient = grpc.ServerStreamingClient[AppointmentEvent]
+
 // AppointmentServiceServer is the server API for AppointmentService service.
 // All implementations must embed UnimplementedAppointmentServiceServer
 // for forward compatibility.
@@ -91,8 +111,8 @@ type AppointmentServiceServer interface {
 	CreateAppointment(context.Context, *CreateAppointmentRequest) (*CreateAppointmentResponse, error)
 	ListAppointments(context.Context, *ListAppointmentsRequest) (*ListAppointmentsResponse, error)
 	DeleteAppointment(context.Context, *DeleteAppointmentRequest) (*DeleteAppointmentResponse, error)
-	// New RPC for searching appointments
 	SearchAppointments(context.Context, *SearchAppointmentsRequest) (*ListAppointmentsResponse, error)
+	StreamAppointments(*StreamAppointmentsRequest, grpc.ServerStreamingServer[AppointmentEvent]) error
 	mustEmbedUnimplementedAppointmentServiceServer()
 }
 
@@ -114,6 +134,9 @@ func (UnimplementedAppointmentServiceServer) DeleteAppointment(context.Context, 
 }
 func (UnimplementedAppointmentServiceServer) SearchAppointments(context.Context, *SearchAppointmentsRequest) (*ListAppointmentsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchAppointments not implemented")
+}
+func (UnimplementedAppointmentServiceServer) StreamAppointments(*StreamAppointmentsRequest, grpc.ServerStreamingServer[AppointmentEvent]) error {
+	return status.Errorf(codes.Unimplemented, "method StreamAppointments not implemented")
 }
 func (UnimplementedAppointmentServiceServer) mustEmbedUnimplementedAppointmentServiceServer() {}
 func (UnimplementedAppointmentServiceServer) testEmbeddedByValue()                            {}
@@ -208,6 +231,17 @@ func _AppointmentService_SearchAppointments_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AppointmentService_StreamAppointments_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(StreamAppointmentsRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(AppointmentServiceServer).StreamAppointments(m, &grpc.GenericServerStream[StreamAppointmentsRequest, AppointmentEvent]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type AppointmentService_StreamAppointmentsServer = grpc.ServerStreamingServer[AppointmentEvent]
+
 // AppointmentService_ServiceDesc is the grpc.ServiceDesc for AppointmentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -232,6 +266,12 @@ var AppointmentService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AppointmentService_SearchAppointments_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "StreamAppointments",
+			Handler:       _AppointmentService_StreamAppointments_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "appointment.proto",
 }

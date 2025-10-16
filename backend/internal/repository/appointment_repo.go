@@ -3,11 +3,11 @@ package repository
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/beejay1293/schedule-management/backend/internal/models"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 type appointmentRepo struct {
@@ -19,27 +19,15 @@ func NewAppointmentRepo(db *gorm.DB) AppointmentRepository {
 }
 
 func (r *appointmentRepo) Create(a *models.Appointment) error {
-	return r.db.Transaction(func(tx *gorm.DB) error {
-		// Lock rows that could conflict (same date/time)
-		var existing models.Appointment
-		err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
-			Where("date = ?", a.Date).
-			Take(&existing).Error
-
-		if err == nil {
+	// Try inserting the new appointment
+	if err := r.db.Create(a).Error; err != nil {
+		// Check if the error is a unique constraint violation
+		if strings.Contains(err.Error(), "unique_appointment_time") {
 			return fmt.Errorf("conflict: appointment already exists at this date/time")
 		}
-
-		// If no record found, create a new one
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			if err := tx.Create(a).Error; err != nil {
-				return err
-			}
-			return nil
-		}
-
 		return err
-	})
+	}
+	return nil
 }
 
 func (r *appointmentRepo) List() ([]models.Appointment, error) {
@@ -77,4 +65,16 @@ func (r *appointmentRepo) Search(title, date string) ([]models.Appointment, erro
 
 	err := tx.Order("date ASC").Find(&appts).Error
 	return appts, err
+}
+
+func (r *appointmentRepo) GetByID(id string) (*models.Appointment, error) {
+	var appt models.Appointment
+	err := r.db.First(&appt, "id = ?", id).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &appt, nil
 }

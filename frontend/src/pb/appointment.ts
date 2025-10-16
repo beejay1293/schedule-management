@@ -107,6 +107,45 @@ export interface SearchAppointmentsRequest {
      */
     date: string; // optional: search by date YYYY-MM-DD
 }
+/**
+ * @generated from protobuf message appointment.AppointmentEvent
+ */
+export interface AppointmentEvent {
+    /**
+     * @generated from protobuf field: appointment.EventType type = 1
+     */
+    type: EventType;
+    /**
+     * @generated from protobuf field: appointment.Appointment appointment = 2
+     */
+    appointment?: Appointment;
+}
+/**
+ * @generated from protobuf message appointment.StreamAppointmentsRequest
+ */
+export interface StreamAppointmentsRequest {
+    /**
+     * @generated from protobuf field: string title_filter = 1
+     */
+    titleFilter: string;
+    /**
+     * @generated from protobuf field: string date_filter = 2
+     */
+    dateFilter: string;
+}
+/**
+ * @generated from protobuf enum appointment.EventType
+ */
+export enum EventType {
+    /**
+     * @generated from protobuf enum value: CREATED = 0;
+     */
+    CREATED = 0,
+    /**
+     * @generated from protobuf enum value: DELETED = 1;
+     */
+    DELETED = 1
+}
 // @generated message type with reflection information, may provide speed optimized methods
 class Appointment$Type extends MessageType<Appointment> {
     constructor() {
@@ -512,6 +551,115 @@ class SearchAppointmentsRequest$Type extends MessageType<SearchAppointmentsReque
  * @generated MessageType for protobuf message appointment.SearchAppointmentsRequest
  */
 export const SearchAppointmentsRequest = new SearchAppointmentsRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class AppointmentEvent$Type extends MessageType<AppointmentEvent> {
+    constructor() {
+        super("appointment.AppointmentEvent", [
+            { no: 1, name: "type", kind: "enum", T: () => ["appointment.EventType", EventType] },
+            { no: 2, name: "appointment", kind: "message", T: () => Appointment }
+        ]);
+    }
+    create(value?: PartialMessage<AppointmentEvent>): AppointmentEvent {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.type = 0;
+        if (value !== undefined)
+            reflectionMergePartial<AppointmentEvent>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AppointmentEvent): AppointmentEvent {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* appointment.EventType type */ 1:
+                    message.type = reader.int32();
+                    break;
+                case /* appointment.Appointment appointment */ 2:
+                    message.appointment = Appointment.internalBinaryRead(reader, reader.uint32(), options, message.appointment);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: AppointmentEvent, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* appointment.EventType type = 1; */
+        if (message.type !== 0)
+            writer.tag(1, WireType.Varint).int32(message.type);
+        /* appointment.Appointment appointment = 2; */
+        if (message.appointment)
+            Appointment.internalBinaryWrite(message.appointment, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message appointment.AppointmentEvent
+ */
+export const AppointmentEvent = new AppointmentEvent$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class StreamAppointmentsRequest$Type extends MessageType<StreamAppointmentsRequest> {
+    constructor() {
+        super("appointment.StreamAppointmentsRequest", [
+            { no: 1, name: "title_filter", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "date_filter", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<StreamAppointmentsRequest>): StreamAppointmentsRequest {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.titleFilter = "";
+        message.dateFilter = "";
+        if (value !== undefined)
+            reflectionMergePartial<StreamAppointmentsRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: StreamAppointmentsRequest): StreamAppointmentsRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string title_filter */ 1:
+                    message.titleFilter = reader.string();
+                    break;
+                case /* string date_filter */ 2:
+                    message.dateFilter = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: StreamAppointmentsRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string title_filter = 1; */
+        if (message.titleFilter !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.titleFilter);
+        /* string date_filter = 2; */
+        if (message.dateFilter !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.dateFilter);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message appointment.StreamAppointmentsRequest
+ */
+export const StreamAppointmentsRequest = new StreamAppointmentsRequest$Type();
 /**
  * @generated ServiceType for protobuf service appointment.AppointmentService
  */
@@ -519,5 +667,6 @@ export const AppointmentService = new ServiceType("appointment.AppointmentServic
     { name: "CreateAppointment", options: {}, I: CreateAppointmentRequest, O: CreateAppointmentResponse },
     { name: "ListAppointments", options: {}, I: ListAppointmentsRequest, O: ListAppointmentsResponse },
     { name: "DeleteAppointment", options: {}, I: DeleteAppointmentRequest, O: DeleteAppointmentResponse },
-    { name: "SearchAppointments", options: {}, I: SearchAppointmentsRequest, O: ListAppointmentsResponse }
+    { name: "SearchAppointments", options: {}, I: SearchAppointmentsRequest, O: ListAppointmentsResponse },
+    { name: "StreamAppointments", serverStreaming: true, options: {}, I: StreamAppointmentsRequest, O: AppointmentEvent }
 ]);

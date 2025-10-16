@@ -13,30 +13,38 @@ export const AppointmentForm: React.FC = () => {
   const { createMutation } = useAppointments();
   const [form, setForm] = useState({ title: "", date: "", time: "" });
   const [errors, setErrors] = useState<FormErrors>({});
-
+  
   const validate = () => {
-  const errs: FormErrors = {};
+    const errs: FormErrors = {};
 
-  // Title validation
-  if (!form.title.trim()) errs.title = "Title is required";
+    // Title validation
+    if (!form.title.trim()) errs.title = "Title is required";
 
-  // Date validation
-  if (!form.date) {
-    errs.date = "Date is required";
-  } else {
-    const selectedDate = new Date(form.date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // start of today
-    if (selectedDate < today) {
-      errs.date = "Date cannot be in the past";
+    // Date & time validation
+    if (!form.date) {
+      errs.date = "Date is required";
     }
-  }
 
-  // Time validation
-  if (!form.time) errs.time = "Time is required";
+    if (!form.time) {
+      errs.time = "Time is required";
+    }
 
-  return errs;
-};
+    if (form.date && form.time) {
+      const [hours, minutes] = form.time.split(":").map(Number);
+      const [year, month, day] = form.date.split("-").map(Number);
+
+      // Create local date/time
+      const selectedDateTime = new Date(year, month - 1, day, hours, minutes, 0);
+
+      const now = new Date();
+  
+      if (selectedDateTime < now) {
+        errs.date = "Date and time must be in the future";
+      }
+   }
+
+    return errs;
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

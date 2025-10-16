@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useAppointments } from "../../hooks/useAppointments";
 import { ConfirmationModal } from "../modals/Confirm";
-import { searchAppointments } from "../../api/appointmentClient";
+import { searchAppointments, streamAppointments, } from "../../api/appointmentClient";
 import "./Appointments.css";
 
 export const AppointmentList: React.FC = () => {
@@ -15,7 +15,30 @@ export const AppointmentList: React.FC = () => {
     appointmentsQuery.data || []
   );
 
-  // Debounce helper
+  useEffect(() => {
+    const stream = streamAppointments(
+      // Handle new appointment
+      (appt) => {
+        setFilteredAppointments((prev) => {
+          const exists = prev.find((a) => a.id === appt.id);
+          if (exists) return prev;
+          return [...prev, appt];
+        });
+      },
+      // Handle deleted appointment
+      (deletedId) => {
+        setFilteredAppointments((prev) =>
+          prev.filter((a) => a.id !== deletedId)
+        );
+      }
+    );
+
+    // Stop streaming when unmounted
+    return () => {
+      stream.stop();
+    };
+  }, []);
+
   const debounce = (fn: Function, delay = 500) => {
     let timeout: NodeJS.Timeout;
     return (...args: any[]) => {
@@ -24,7 +47,6 @@ export const AppointmentList: React.FC = () => {
     };
   };
 
-  // Search function
   const handleSearch = useCallback(
     debounce(async () => {
       if (!searchTitle && !searchDate) {

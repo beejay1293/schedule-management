@@ -1,4 +1,4 @@
-MIGRATION_PATH=backend/internal/db/migrations
+MIGRATION_PATH=internal/db/migrations
 
 .PHONY: create-migration gen-proto start-app
 
