@@ -55,3 +55,33 @@ func (s *AppointmentService) CreateAppointment(ctx context.Context, req *pb.Crea
 		},
 	}, nil
 }
+
+func (s *AppointmentService) ListAppointments(ctx context.Context, req *pb.ListAppointmentsRequest) (*pb.ListAppointmentsResponse, error) {
+	appointments, err := s.repo.List()
+	if err != nil {
+		return nil, err
+	}
+
+	var pbAppointments []*pb.Appointment
+	for _, a := range appointments {
+		pbAppointments = append(pbAppointments, &pb.Appointment{
+			Id:    a.ID,
+			Title: a.Title,
+			Date:  a.Date.Format("2006-01-02"),
+			Time:  a.Date.Format("15:04"),
+		})
+	}
+
+	return &pb.ListAppointmentsResponse{
+		Appointments: pbAppointments,
+	}, nil
+}
+
+func (s *AppointmentService) DeleteAppointment(ctx context.Context, req *pb.DeleteAppointmentRequest) (*pb.DeleteAppointmentResponse, error) {
+	err := s.repo.Delete(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.DeleteAppointmentResponse{}, nil
+}

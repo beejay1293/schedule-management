@@ -26,19 +26,17 @@ func New(database *gorm.DB) (*App, error) {
 		return nil, err
 	}
 
-	// Create gRPC server
+	// Create server
 	grpcServer := grpc.NewServer()
 
-	// --- Repositories ---
 	appointmentRepo := repository.NewAppointmentRepo(database)
 
-	// --- Services ---
 	appointmentSvc := service.NewAppointmentService(appointmentRepo)
 
-	// --- Register gRPC services ---
+	// Register services
 	pb.RegisterAppointmentServiceServer(grpcServer, appointmentSvc)
 
-	log.Println("All gRPC services registered")
+	log.Println("All services registered")
 
 	return &App{
 		Server:   grpcServer,

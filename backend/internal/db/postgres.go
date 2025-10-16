@@ -1,6 +1,8 @@
 package database
 
 import (
+	"fmt"
+	"log"
 	"os"
 
 	"gorm.io/driver/postgres"
@@ -16,15 +18,17 @@ func ProvidePostgres() *gorm.DB {
 	// Connect to the postgres database
 	gormdb, err := Connect(postgres.Open(postgresDbUrl))
 	if err != nil {
-		// zerolog.Logger.Err(err).Msg("postgres database connection error")
+		log.Fatalf("postgres database connection error: %v", err)
 	}
 
+	fmt.Println("run migration", os.Getenv("RUN_DB_MIGRATIONS"))
+
 	// // Optionally run migrations
-	// if os.Getenv("RUN_DB_MIGRATIONS") == "true" {
-	// 	if err := Migrate(gormdb); err != nil {
-	// 		// zerolog.Fatal().Err(err).Msg("failed to run database migrations")
-	// 	}
-	// }
+	if os.Getenv("RUN_DB_MIGRATIONS") == "true" {
+		if err := Migrate(gormdb); err != nil {
+			log.Fatalf("failed to run database migrations: %v", err)
+		}
+	}
 
 	return gormdb
 }

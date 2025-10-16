@@ -1,18 +1,24 @@
-import { 
-  CreateAppointmentRequest, 
-  ListAppointmentsRequest, 
-  DeleteAppointmentRequest, 
-  Appointment as PbAppointment } from '../pb/appointment_pb';
-import { AppointmentServiceClient } from "../pb/appointment_grpc_web_pb";
+// src/api/appointmentClient.ts
+import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport';
+import { AppointmentServiceClient } from "../pb/appointment.client";
+import {
+  CreateAppointmentRequest,
+  ListAppointmentsRequest,
+  DeleteAppointmentRequest,
+  Appointment as PbAppointment,
+} from "../pb/appointment";
 
 // gRPC-Web proxy URL
 const PROXY_URL = import.meta.env.VITE_GRPC_PROXY_URL ?? "http://localhost:8080";
 
-// Create gRPC client
-const client = new AppointmentServiceClient(PROXY_URL, null, null);
+// Create transport and gRPC client
+const transport = new GrpcWebFetchTransport({
+  baseUrl: PROXY_URL
+});
+const grpcClient = new AppointmentServiceClient(transport);
 
 // TypeScript-friendly Appointment type
-export type Appointment = {
+export type AppointmentTS = {
   id: string;
   title: string;
   date: string; // "YYYY-MM-DD"
@@ -20,61 +26,32 @@ export type Appointment = {
 };
 
 // Helper: convert proto Appointment -> plain TS type
-function pbToAppointment(pb: PbAppointment): Appointment {
+function pbToAppointment(pb: PbAppointment): AppointmentTS {
   return {
-    id: pb.getId(),
-    title: pb.getTitle(),
-    date: pb.getDate(),
-    time: pb.getTime(),
+    id: pb.id,
+    title: pb.title,
+    date: pb.date,
+    time: pb.time,
   };
 }
 
 // Create appointment
-export async function createAppointment(payload: {
-  title: string;
-  date: string;
-  time: string;
-}): Promise<Appointment> {
-  const req = new CreateAppointmentRequest();
-  req.setTitle(payload.title);
-  req.setDate(payload.date);
-  req.setTime(payload.time);
-
-  return new Promise((resolve, reject) => {
-    client.createAppointment(req, {}, (err, resp) => {
-      if (err) return reject(err);
-      if (!resp || !resp.getAppointment()) return reject(new Error("No response"));
-      resolve(pbToAppointment(resp.getAppointment()!));
-    });
-  });
+export async function createAppointment(payload: { title: string; date: string; time: string }): Promise<AppointmentTS> {
+  const req = CreateAppointmentRequest.create(payload);
+  const resp = await grpcClient.createAppointment(req);
+  if (!resp.response?.appointment) throw new Error("No appointment returned");
+  return pbToAppointment(resp.response.appointment);
 }
 
 // List all appointments
-export async function listAppointments(): Promise<Appointment[]> {
-  const req = new ListAppointmentsRequest();
-
-  return new Promise((resolve, reject) => {
-    client.listAppointments(req, {}, (err, resp) => {
-      if (err) return reject(err);
-      if (!resp) return resolve([]);
-      const items = resp.getAppointmentsList().map(pbToAppointment);
-
-      // Sort chronologically by date + time
-      items.sort((a: { date: any; time: any; }, b: { date: any; time: any; }) => `${a.date}T${a.time}`.localeCompare(`${b.date}T${b.time}`));
-      resolve(items);
-    });
-  });
+export async function listAppointments(): Promise<AppointmentTS[]> {
+  const req = ListAppointmentsRequest.create();
+  const resp = await grpcClient.listAppointments(req);
+  return (resp.response?.appointments || []).map(pbToAppointment);
 }
 
 // Delete appointment
 export async function deleteAppointment(id: string): Promise<void> {
-  const req = new DeleteAppointmentRequest();
-  req.setId(id);
-
-  return new Promise((resolve, reject) => {
-    client.deleteAppointment(req, {}, (err) => {
-      if (err) reject(err);
-      else resolve();
-    });
-  });
+  const req = DeleteAppointmentRequest.create({ id });
+  await grpcClient.deleteAppointment(req);
 }

@@ -3,13 +3,13 @@ import {
   listAppointments,
   createAppointment,
   deleteAppointment,
-  type Appointment,
+  type AppointmentTS,
 } from "../api/appointmentClient";
 
 export function useAppointments() {
   const queryClient = useQueryClient();
 
-  const appointmentsQuery = useQuery<Appointment[]>({
+  const appointmentsQuery = useQuery<AppointmentTS[]>({
     queryKey: ["appointments"],
     queryFn: listAppointments,
   });

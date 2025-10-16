@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -19,26 +20,25 @@ func NewAppointmentRepo(db *gorm.DB) AppointmentRepository {
 
 func (r *appointmentRepo) Create(a *models.Appointment) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
-		// Check if an appointment already exists at the requested date/time
-		var count int64
-		if err := tx.Model(&models.Appointment{}).
+		// Lock rows that could conflict (same date/time)
+		var existing models.Appointment
+		err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
 			Where("date = ?", a.Date).
-			// lock matching rows to prevent concurrent inserts at the same time
-			Clauses(clause.Locking{Strength: "UPDATE"}).
-			Count(&count).Error; err != nil {
-			return err
-		}
+			Take(&existing).Error
 
-		if count > 0 {
+		if err == nil {
 			return fmt.Errorf("conflict: appointment already exists at this date/time")
 		}
 
-		// Create the appointment
-		if err := tx.Create(a).Error; err != nil {
-			return err
+		// If no record found, create a new one
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			if err := tx.Create(a).Error; err != nil {
+				return err
+			}
+			return nil
 		}
 
-		return nil
+		return err
 	})
 }
 

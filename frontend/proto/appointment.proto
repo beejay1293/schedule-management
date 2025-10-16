@@ -1,6 +1,5 @@
 syntax = "proto3";
 package appointment;
-option go_package = "github.com/beejay1293/schedule-management/backend/internal/pb;pb";
 
 message Appointment {
   string id = 1;
