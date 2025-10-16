@@ -57,3 +57,24 @@ func (r *appointmentRepo) ExistsAt(date time.Time) (bool, error) {
 	err := r.db.Model(&models.Appointment{}).Where("date = ?", date).Count(&count).Error
 	return count > 0, err
 }
+
+func (r *appointmentRepo) Search(title, date string) ([]models.Appointment, error) {
+	var appts []models.Appointment
+	tx := r.db.Model(&models.Appointment{})
+
+	if title != "" {
+		tx = tx.Where("title ILIKE ?", "%"+title+"%") // case-insensitive search
+	}
+
+	if date != "" {
+		// parse date string to match the date column
+		parsedDate, err := time.Parse("2006-01-02", date)
+		if err != nil {
+			return nil, fmt.Errorf("invalid date format")
+		}
+		tx = tx.Where("date::date = ?", parsedDate.Format("2006-01-02"))
+	}
+
+	err := tx.Order("date ASC").Find(&appts).Error
+	return appts, err
+}

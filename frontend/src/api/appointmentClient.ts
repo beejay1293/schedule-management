@@ -1,23 +1,20 @@
-// src/api/appointmentClient.ts
 import { GrpcWebFetchTransport } from '@protobuf-ts/grpcweb-transport';
 import { AppointmentServiceClient } from "../pb/appointment.client";
 import {
   CreateAppointmentRequest,
   ListAppointmentsRequest,
   DeleteAppointmentRequest,
+  SearchAppointmentsRequest,
   Appointment as PbAppointment,
 } from "../pb/appointment";
 
 // gRPC-Web proxy URL
 const PROXY_URL = import.meta.env.VITE_GRPC_PROXY_URL ?? "http://localhost:8080";
 
-// Create transport and gRPC client
-const transport = new GrpcWebFetchTransport({
-  baseUrl: PROXY_URL
-});
+// Transport and gRPC client
+const transport = new GrpcWebFetchTransport({ baseUrl: PROXY_URL });
 const grpcClient = new AppointmentServiceClient(transport);
 
-// TypeScript-friendly Appointment type
 export type AppointmentTS = {
   id: string;
   title: string;
@@ -54,4 +51,11 @@ export async function listAppointments(): Promise<AppointmentTS[]> {
 export async function deleteAppointment(id: string): Promise<void> {
   const req = DeleteAppointmentRequest.create({ id });
   await grpcClient.deleteAppointment(req);
+}
+
+// Search appointments
+export async function searchAppointments(payload: { title?: string; date?: string }): Promise<AppointmentTS[]> {
+  const req = SearchAppointmentsRequest.create(payload);
+  const resp = await grpcClient.searchAppointments(req);
+  return (resp.response?.appointments || []).map(pbToAppointment);
 }

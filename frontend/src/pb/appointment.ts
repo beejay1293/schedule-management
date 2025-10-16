@@ -26,13 +26,15 @@ export interface Appointment {
     /**
      * @generated from protobuf field: string date = 3
      */
-    date: string;
+    date: string; // YYYY-MM-DD
     /**
      * @generated from protobuf field: string time = 4
      */
-    time: string;
+    time: string; // HH:mm
 }
 /**
+ * Create
+ *
  * @generated from protobuf message appointment.CreateAppointmentRequest
  */
 export interface CreateAppointmentRequest {
@@ -59,6 +61,8 @@ export interface CreateAppointmentResponse {
     appointment?: Appointment;
 }
 /**
+ * List
+ *
  * @generated from protobuf message appointment.ListAppointmentsRequest
  */
 export interface ListAppointmentsRequest {
@@ -73,6 +77,8 @@ export interface ListAppointmentsResponse {
     appointments: Appointment[];
 }
 /**
+ * Delete
+ *
  * @generated from protobuf message appointment.DeleteAppointmentRequest
  */
 export interface DeleteAppointmentRequest {
@@ -85,6 +91,21 @@ export interface DeleteAppointmentRequest {
  * @generated from protobuf message appointment.DeleteAppointmentResponse
  */
 export interface DeleteAppointmentResponse {
+}
+/**
+ * Search
+ *
+ * @generated from protobuf message appointment.SearchAppointmentsRequest
+ */
+export interface SearchAppointmentsRequest {
+    /**
+     * @generated from protobuf field: string title = 1
+     */
+    title: string; // optional: search by title
+    /**
+     * @generated from protobuf field: string date = 2
+     */
+    date: string; // optional: search by date YYYY-MM-DD
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class Appointment$Type extends MessageType<Appointment> {
@@ -436,11 +457,67 @@ class DeleteAppointmentResponse$Type extends MessageType<DeleteAppointmentRespon
  * @generated MessageType for protobuf message appointment.DeleteAppointmentResponse
  */
 export const DeleteAppointmentResponse = new DeleteAppointmentResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SearchAppointmentsRequest$Type extends MessageType<SearchAppointmentsRequest> {
+    constructor() {
+        super("appointment.SearchAppointmentsRequest", [
+            { no: 1, name: "title", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "date", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<SearchAppointmentsRequest>): SearchAppointmentsRequest {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.title = "";
+        message.date = "";
+        if (value !== undefined)
+            reflectionMergePartial<SearchAppointmentsRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SearchAppointmentsRequest): SearchAppointmentsRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string title */ 1:
+                    message.title = reader.string();
+                    break;
+                case /* string date */ 2:
+                    message.date = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: SearchAppointmentsRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string title = 1; */
+        if (message.title !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.title);
+        /* string date = 2; */
+        if (message.date !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.date);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message appointment.SearchAppointmentsRequest
+ */
+export const SearchAppointmentsRequest = new SearchAppointmentsRequest$Type();
 /**
  * @generated ServiceType for protobuf service appointment.AppointmentService
  */
 export const AppointmentService = new ServiceType("appointment.AppointmentService", [
     { name: "CreateAppointment", options: {}, I: CreateAppointmentRequest, O: CreateAppointmentResponse },
     { name: "ListAppointments", options: {}, I: ListAppointmentsRequest, O: ListAppointmentsResponse },
-    { name: "DeleteAppointment", options: {}, I: DeleteAppointmentRequest, O: DeleteAppointmentResponse }
+    { name: "DeleteAppointment", options: {}, I: DeleteAppointmentRequest, O: DeleteAppointmentResponse },
+    { name: "SearchAppointments", options: {}, I: SearchAppointmentsRequest, O: ListAppointmentsResponse }
 ]);

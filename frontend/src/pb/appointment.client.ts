@@ -4,6 +4,7 @@
 import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { AppointmentService } from "./appointment";
+import type { SearchAppointmentsRequest } from "./appointment";
 import type { DeleteAppointmentResponse } from "./appointment";
 import type { DeleteAppointmentRequest } from "./appointment";
 import type { ListAppointmentsResponse } from "./appointment";
@@ -29,6 +30,12 @@ export interface IAppointmentServiceClient {
      * @generated from protobuf rpc: DeleteAppointment
      */
     deleteAppointment(input: DeleteAppointmentRequest, options?: RpcOptions): UnaryCall<DeleteAppointmentRequest, DeleteAppointmentResponse>;
+    /**
+     * New RPC for searching appointments
+     *
+     * @generated from protobuf rpc: SearchAppointments
+     */
+    searchAppointments(input: SearchAppointmentsRequest, options?: RpcOptions): UnaryCall<SearchAppointmentsRequest, ListAppointmentsResponse>;
 }
 /**
  * @generated from protobuf service appointment.AppointmentService
@@ -59,5 +66,14 @@ export class AppointmentServiceClient implements IAppointmentServiceClient, Serv
     deleteAppointment(input: DeleteAppointmentRequest, options?: RpcOptions): UnaryCall<DeleteAppointmentRequest, DeleteAppointmentResponse> {
         const method = this.methods[2], opt = this._transport.mergeOptions(options);
         return stackIntercept<DeleteAppointmentRequest, DeleteAppointmentResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * New RPC for searching appointments
+     *
+     * @generated from protobuf rpc: SearchAppointments
+     */
+    searchAppointments(input: SearchAppointmentsRequest, options?: RpcOptions): UnaryCall<SearchAppointmentsRequest, ListAppointmentsResponse> {
+        const method = this.methods[3], opt = this._transport.mergeOptions(options);
+        return stackIntercept<SearchAppointmentsRequest, ListAppointmentsResponse>("unary", this._transport, method, opt, input);
     }
 }

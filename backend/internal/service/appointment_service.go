@@ -85,3 +85,24 @@ func (s *AppointmentService) DeleteAppointment(ctx context.Context, req *pb.Dele
 
 	return &pb.DeleteAppointmentResponse{}, nil
 }
+
+func (s *AppointmentService) SearchAppointments(ctx context.Context, req *pb.SearchAppointmentsRequest) (*pb.ListAppointmentsResponse, error) {
+	appointments, err := s.repo.Search(req.Title, req.Date)
+	if err != nil {
+		return nil, err
+	}
+
+	var pbAppointments []*pb.Appointment
+	for _, a := range appointments {
+		pbAppointments = append(pbAppointments, &pb.Appointment{
+			Id:    a.ID,
+			Title: a.Title,
+			Date:  a.Date.Format("2006-01-02"),
+			Time:  a.Date.Format("15:04"),
+		})
+	}
+
+	return &pb.ListAppointmentsResponse{
+		Appointments: pbAppointments,
+	}, nil
+}
