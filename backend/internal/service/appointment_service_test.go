@@ -88,12 +88,15 @@ func TestAppointmentService_DeleteAppointment(t *testing.T) {
 	req := &pb.CreateAppointmentRequest{
 		Title: "To Delete",
 		Date:  time.Now().Format("2006-01-02"),
-		Time:  time.Now().Format("15:04"),
+		Time:  time.Now().Add(2 * time.Hour).Format("15:04"),
 	}
-	createResp, _ := svc.CreateAppointment(ctx, req)
+	createResp, err := svc.CreateAppointment(ctx, req)
+	if err != nil {
+		t.Fatalf("create failed: %v", err)
+	}
 
 	// Delete appointment
-	_, err := svc.DeleteAppointment(ctx, &pb.DeleteAppointmentRequest{Id: createResp.Appointment.Id})
+	_, err = svc.DeleteAppointment(ctx, &pb.DeleteAppointmentRequest{Id: createResp.Appointment.Id})
 	if err != nil {
 		t.Fatalf("delete failed: %v", err)
 	}

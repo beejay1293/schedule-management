@@ -1,7 +1,9 @@
 package repository
 
 import (
+	"fmt"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -117,5 +119,49 @@ func TestAppointmentRepo_AllMethods(t *testing.T) {
 	_, err = repo.Search("", "invalid-date")
 	if err == nil || !strings.Contains(err.Error(), "invalid date") {
 		t.Fatalf("Search should fail for invalid date, got: %v", err)
+	}
+}
+
+// --- Test Concurrency ---
+// Two users trying to create an appointment at the same time
+func TestAppointmentRepo_Create_ConcurrentConflict(t *testing.T) {
+	db := database.SetupTestDB(t)
+	repo := NewAppointmentRepo(db)
+
+	date := time.Now().Add(2 * time.Hour)
+	numGoroutines := 2
+	errs := make(chan error, numGoroutines)
+
+	var wg sync.WaitGroup
+	wg.Add(numGoroutines)
+
+	for i := 1; i <= numGoroutines; i++ {
+		go func(i int) {
+			defer wg.Done()
+			appt := &models.Appointment{
+				ID:    fmt.Sprintf("concurrent-%d", i),
+				Title: fmt.Sprintf("Concurrent %d", i),
+				Date:  date,
+			}
+			errs <- repo.Create(appt)
+		}(i)
+	}
+
+	wg.Wait()
+	close(errs)
+
+	var successCount, conflictCount int
+	for err := range errs {
+		if err == nil {
+			successCount++
+		} else if status.Code(err) == codes.AlreadyExists {
+			conflictCount++
+		} else {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	}
+
+	if successCount != 1 || conflictCount != 1 {
+		t.Fatalf("expected 1 success and 1 conflict, got %d success and %d conflict", successCount, conflictCount)
 	}
 }
