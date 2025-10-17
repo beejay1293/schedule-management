@@ -22,5 +22,5 @@ gen-proto:
 start-app:
 	go run cmd/server/main.go
 
-run-tests:
+test:
 	go test ./... -v
