@@ -21,19 +21,54 @@
   font-size: 1rem;
 }
 
-.appointment-delete-btn {
-  background: #e74c3c;
-  color: white;
+
+.appointment-card {
+  background-color: #ffffff; 
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.appointment-card:hover {
+  transform: scale(1.02); 
+}
+
+.card-content h3 {
+  margin: 0 0 10px 0; 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: #1e3a5f; 
+}
+
+.card-content p {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #4f5d75; 
+}
+
+.appointment-card .appointment-delete-btn {
+  background: #ffcccc; 
+  color: #8b0000;      
   border: none;
   border-radius: 8px;
   padding: 0.5rem 1rem;
   cursor: pointer;
-  transition: background 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  transition: background 0.3s ease, transform 0.2s ease;
 }
 
-.appointment-delete-btn:hover:not(:disabled) {
-  background: #c0392b;
+.appointment-card .appointment-delete-btn:hover:not(:disabled) {
+  background-color: #ff9999 !important; 
+  transform: scale(1.05);
 }
+
 
 .appointment-delete-btn:disabled {
   background: #95a5a6;
@@ -49,10 +84,9 @@
 }
 
 .appointment-form {
-  background: #f9f9f9;
+  background: white;
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   margin-bottom: 2rem;
 }
 
@@ -148,7 +182,6 @@
 }
 
 .error.conflict {
-  font-weight: bold;
   text-align: center;
   background: #fdecea;
   border: 1px solid #f5c6cb;
@@ -232,7 +265,7 @@
   }
 
   .appointment-list li {
-      display: inline-block;
+      display: block;
   }
 }
 

@@ -10,7 +10,11 @@ interface FormErrors {
   conflict?: string;
 }
 
-export const AppointmentForm: React.FC = () => {
+interface AppointmentFormProps {
+  onSuccess?: () => void;
+}
+
+export const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSuccess }) => {
   const { createMutation } = useAppointments();
   const [form, setForm] = useState({ title: "", date: "", time: "" });
   const [errors, setErrors] = useState<FormErrors>({});
@@ -64,6 +68,10 @@ export const AppointmentForm: React.FC = () => {
     }
 
     createMutation.mutate(form, {
+
+        onSuccess: () => {
+    if (onSuccess) onSuccess(); // <-- this calls the callback
+  },
       onError: (err: any) => {
         const code = err.code;
 

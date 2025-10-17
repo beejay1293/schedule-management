@@ -52,3 +52,10 @@
   background: #e74c3c;
   color: white;
 }
+
+@media (max-width: 480px) {
+  .modal {
+    padding: 10px;
+    width: 80%;
+  }
+}
