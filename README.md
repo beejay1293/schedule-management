@@ -124,7 +124,8 @@ The backend includes tests for:
 Run all tests with:
 
 ```bash
-run-tests
+cd backend
+make test
 ```
 
 ---
