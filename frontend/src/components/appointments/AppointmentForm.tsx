@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { StatusCode } from "grpc-web";
 import { useAppointments } from "../../hooks/useAppointments";
+
 import "./Appointments.css";
 
 interface FormErrors {
@@ -70,7 +71,7 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSuccess }) =
     createMutation.mutate(form, {
 
         onSuccess: () => {
-    if (onSuccess) onSuccess(); // <-- this calls the callback
+    if (onSuccess) onSuccess(); 
   },
       onError: (err: any) => {
         const code = err.code;
@@ -109,6 +110,7 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSuccess }) =
 
       <input
         type="date"
+        placeholder="choose date"
         value={form.date}
         onChange={(e) => setForm({ ...form, date: e.target.value })}
       />
