@@ -19,6 +19,14 @@ export const AppointmentList: React.FC = () => {
     appointmentsQuery.data || []
   );
 
+  const formatDate = (dateString: string) =>
+  new Date(dateString).toLocaleDateString(undefined, {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
   useEffect(() => {
     const stream = streamAppointments(
       // Handle new appointment
@@ -129,7 +137,7 @@ export const AppointmentList: React.FC = () => {
               <div className="card-content">
                 <h3>{a.title}</h3>
                 <p>
-                  {a.date} at {a.time}
+                  {formatDate(a.date)} at {a.time}
                 </p>
               </div>
               <button
