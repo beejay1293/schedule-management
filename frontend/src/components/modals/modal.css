@@ -44,11 +44,19 @@
 }
 
 .btn-cancel {
-  background: #ccc;
-  color: #333;
+  background: #3498db;
+  color: #fff;
 }
 
 .btn-confirm {
-  background: #e74c3c;
-  color: white;
+  background: #ffcccc;
+  color: #8b0000;
+  font-weight: 600;
+}
+
+@media (max-width: 480px) {
+  .modal {
+    padding: 10px;
+    width: 80%;
+  }
 }

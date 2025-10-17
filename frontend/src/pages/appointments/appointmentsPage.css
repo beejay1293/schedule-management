@@ -1,9 +1,127 @@
-
 .appointments-page {
   max-width: 600px;
   margin: 2rem auto;
   padding: 1.5rem;
-  background: #ffffff;
+  background: #edf6ff;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.appointments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 20px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.appointments-header h2 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 28px;
+  color: #1e3a5f;
+  margin: 0;
+}
+
+.create-btn {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  background-color: #3498db;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.create-btn:hover {
+  background-color: #2980b9;
+}
+
+@keyframes floatLoop {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.no-appointments-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  padding: 40px 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  margin-top: 40px;
+}
+
+.no-appointments-img {
+  width: 120px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.no-appointments-text {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: #2c3e50;
+  text-align: center;
+}
+
+.modal-content {
+  position: absolute;
+  background: #ffffff;
+  border: 1px solid #d6eaff;
+  border-radius: 16px;
+  padding: 2rem;
+  width: 350px;
+  max-width: 90%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  animation: slideIn 0.3s ease forwards;
+}
+
+.modal-close-modal-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #e0f0ff;
+  color: #1e3a5f;
+  border: none;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.modal-close-modal-btn:hover {
+  background: #d6eaff;
+  transform: scale(1.05);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateX(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .appointments-header {
+    display: block;
+  }
 }

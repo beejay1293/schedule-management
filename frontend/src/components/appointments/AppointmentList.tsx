@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useAppointments } from "../../hooks/useAppointments";
 import { ConfirmationModal } from "../modals/Confirm";
-import { searchAppointments, streamAppointments, } from "../../api/appointmentClient";
-import "./Appointments.css";
+import {
+  searchAppointments,
+  streamAppointments,
+} from "../../api/appointmentClient";
+import "./appointments.css";
+import calendar from "../../assets/calendar.png";
 
 export const AppointmentList: React.FC = () => {
   const { appointmentsQuery, deleteMutation } = useAppointments();
@@ -14,6 +18,14 @@ export const AppointmentList: React.FC = () => {
   const [filteredAppointments, setFilteredAppointments] = useState(
     appointmentsQuery.data || []
   );
+
+  const formatDate = (dateString: string) =>
+  new Date(dateString).toLocaleDateString(undefined, {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
   useEffect(() => {
     const stream = streamAppointments(
@@ -100,27 +112,44 @@ export const AppointmentList: React.FC = () => {
       </div>
 
       <ul className="appointment-list">
-        {appointmentsQuery.isLoading
-          ? Array.from({ length: 5 }).map((_, idx) => (
-              <li key={idx} className="appointment-item skeleton">
-                <span className="skeleton-text">&nbsp;</span>
-                <button className="appointment-delete-btn skeleton-btn" disabled />
-              </li>
-            ))
-          : filteredAppointments.map((a) => (
-              <li key={a.id} className="appointment-item">
-                <span>
-                  <strong>{a.title}</strong> — {a.date} at {a.time}
-                </span>
-                <button
-                  className="appointment-delete-btn"
-                  onClick={() => handleDeleteClick(a.id)}
-                  disabled={deleteMutation.isPending}
-                >
-                  {deleteMutation.isPending ? "Deleting..." : "Delete"}
-                </button>
-              </li>
-            ))}
+        {appointmentsQuery.isLoading ? (
+          Array.from({ length: 5 }).map((_, idx) => (
+            <li key={idx} className="appointment-item skeleton">
+              <span className="skeleton-text">&nbsp;</span>
+              <button
+                className="appointment-delete-btn skeleton-btn"
+                disabled
+              />
+            </li>
+          ))
+        ) : filteredAppointments.length == 0 ? (
+          <div className="no-appointments-card">
+            <img
+              src={calendar}
+              alt="No appointments"
+              className="no-appointments-img"
+            />
+            <p className="no-appointments-text">No appointments scheduled</p>
+          </div>
+        ) : (
+          filteredAppointments.map((a) => (
+            <li key={a.id} className="appointment-card">
+              <div className="card-content">
+                <h3>{a.title}</h3>
+                <p>
+                  {formatDate(a.date)} at {a.time}
+                </p>
+              </div>
+              <button
+                className="appointment-delete-btn"
+                onClick={() => handleDeleteClick(a.id)}
+                disabled={deleteMutation.isPending}
+              >
+                {deleteMutation.isPending ? "Deleting..." : "Delete"}
+              </button>
+            </li>
+          ))
+        )}
       </ul>
 
       <ConfirmationModal

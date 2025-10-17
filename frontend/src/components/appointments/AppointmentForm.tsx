@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { StatusCode } from "grpc-web";
 import { useAppointments } from "../../hooks/useAppointments";
+
 import "./Appointments.css";
 
 interface FormErrors {
@@ -10,13 +11,19 @@ interface FormErrors {
   conflict?: string;
 }
 
-export const AppointmentForm: React.FC = () => {
+interface AppointmentFormProps {
+  onSuccess?: () => void;
+}
+
+export const AppointmentForm: React.FC<AppointmentFormProps> = ({
+  onSuccess,
+}) => {
   const { createMutation } = useAppointments();
   const [form, setForm] = useState({ title: "", date: "", time: "" });
   const [errors, setErrors] = useState<FormErrors>({});
 
   const MAX_TITLE_LENGTH = 100;
-  
+
   const validate = () => {
     const errs: FormErrors = {};
 
@@ -41,14 +48,21 @@ export const AppointmentForm: React.FC = () => {
       const [year, month, day] = form.date.split("-").map(Number);
 
       // Create local date/time
-      const selectedDateTime = new Date(year, month - 1, day, hours, minutes, 0);
+      const selectedDateTime = new Date(
+        year,
+        month - 1,
+        day,
+        hours,
+        minutes,
+        0
+      );
 
       const now = new Date();
-  
+
       if (selectedDateTime < now) {
         errs.date = "Date and time must be in the future";
       }
-   }
+    }
 
     return errs;
   };
@@ -64,6 +78,9 @@ export const AppointmentForm: React.FC = () => {
     }
 
     createMutation.mutate(form, {
+      onSuccess: () => {
+        if (onSuccess) onSuccess();
+      },
       onError: (err: any) => {
         const code = err.code;
 
@@ -72,7 +89,9 @@ export const AppointmentForm: React.FC = () => {
         } else if (code === StatusCode.INVALID_ARGUMENT) {
           setErrors({ conflict: "Invalid input. Please check your data." });
         } else {
-          setErrors({ conflict: err.message || "Failed to schedule appointment" });
+          setErrors({
+            conflict: err.message || "Failed to schedule appointment",
+          });
         }
       },
     });
@@ -84,11 +103,11 @@ export const AppointmentForm: React.FC = () => {
 
       {errors.conflict && <p className="error conflict">{errors.conflict}</p>}
 
-      {form.title.length > 0 &&
-      <small>
+      {form.title.length > 0 && (
+        <small>
           {form.title.length}/{MAX_TITLE_LENGTH} characters
         </small>
-      }
+      )}
       <input
         type="text"
         placeholder="Title"
@@ -96,11 +115,12 @@ export const AppointmentForm: React.FC = () => {
         maxLength={MAX_TITLE_LENGTH}
         onChange={(e) => setForm({ ...form, title: e.target.value })}
       />
-       
+
       {errors.title && <p className="error">{errors.title}</p>}
 
       <input
         type="date"
+        placeholder="choose date"
         value={form.date}
         onChange={(e) => setForm({ ...form, date: e.target.value })}
       />

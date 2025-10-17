@@ -55,7 +55,8 @@ VITE_GRPC_PROXY_URL=http://localhost:8080
 
 #### 3. Start PostgreSQL
 
-Make sure PostgreSQL is running and accessible on port `5432`.
+- Make sure PostgreSQL is running and accessible on port `5432`.
+- Also, create a database named `schedule_db` if it doesn’t already exist.
 
 #### 4. Run Backend
 
