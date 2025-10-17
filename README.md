@@ -123,19 +123,21 @@ The backend includes tests for:
 Run all tests with:
 
 ```bash
-make test
+run-tests
 ```
 
 ---
 
 ### 💡 Implementation Summary
 
-* Built a **gRPC service** in Go to handle appointments.
-* Used **PostgreSQL** with transaction locking to safely manage concurrent bookings.
-* Frontend communicates through **gRPC-Web**, bridged using `grpcwebproxy`.
-* Used **protobuf-ts** for strongly typed client stubs in TypeScript.
-* Automatically runs migrations on startup for smoother local setup.
-* Organized test suite to verify CRUD operations, conflict prevention, and concurrency safety.
+- Built a **gRPC service** in Go to handle appointments.  
+- Used **PostgreSQL** with a **unique constraint on appointment datetime** and **transactional inserts** to safely prevent double bookings.  
+- Implemented **database-level concurrency control** instead of in-memory locks (like `sync.Mutex`), ensuring consistency across multiple service instances in distributed environments.  
+- Frontend communicates through **gRPC-Web**, bridged using `grpcwebproxy`.  
+- Used **protobuf-ts** for strongly typed client stubs in TypeScript.  
+- Automatically runs migrations on startup for a smoother local setup.  
+- Organized a comprehensive test suite to verify **CRUD operations**, **conflict prevention**, and **concurrency safety**.
+
 
 
 ## 🧠 Assumptions & Limitations
@@ -143,4 +145,5 @@ make test
 * Appointments are validated to prevent overlapping time ranges
 * All time values stored in UTC
 * No authentication (out of scope for this assessment)
-* Real-time updates not implemented, but could be added with gRPC streaming
+* Real-time updates are implemented via gRPC streaming; however, in local testing the stream can occasionally break, especially when creating new appointments. Delete events are generally more stable, as they trigger fewer chunked HTTP responses.
+* Mutex-based synchronization not used in the service layer because it wouldn't provide safety in a multi-instance deployment; proper concurrency control should rely on the database

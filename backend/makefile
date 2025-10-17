@@ -21,3 +21,6 @@ gen-proto:
 # Start the Go backend app
 start-app:
 	go run cmd/server/main.go
+
+run-tests:
+	go test ./... -v

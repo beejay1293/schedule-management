@@ -45,7 +45,7 @@ func (s *AppointmentService) CreateAppointment(ctx context.Context, req *pb.Crea
 		return nil, status.Errorf(codes.Internal, "failed to check existing appointments: %v", err)
 	}
 	if conflict {
-		return nil, status.Error(codes.AlreadyExists, "appointment already exists at this time")
+		return nil, status.Error(codes.AlreadyExists, "conflict: another appointment exists at that time")
 	}
 
 	a := &models.Appointment{
