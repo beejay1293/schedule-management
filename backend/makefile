@@ -1,4 +1,4 @@
-MIGRATION_PATH=backend/internal/db/migrations
+MIGRATION_PATH=internal/db/migrations
 
 .PHONY: create-migration gen-proto start-app
 
@@ -21,3 +21,6 @@ gen-proto:
 # Start the Go backend app
 start-app:
 	go run cmd/server/main.go
+
+run-tests:
+	go test ./... -v

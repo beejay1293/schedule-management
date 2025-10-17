@@ -11,4 +11,6 @@ type AppointmentRepository interface {
 	List() ([]models.Appointment, error)
 	Delete(id string) error
 	ExistsAt(date time.Time) (bool, error)
+	Search(title, date string) ([]models.Appointment, error)
+	GetByID(id string) (*models.Appointment, error)
 }

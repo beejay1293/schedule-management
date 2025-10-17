@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { StatusCode } from "grpc-web";
 import { useAppointments } from "../../hooks/useAppointments";
 import "./Appointments.css";
 
@@ -14,29 +15,43 @@ export const AppointmentForm: React.FC = () => {
   const [form, setForm] = useState({ title: "", date: "", time: "" });
   const [errors, setErrors] = useState<FormErrors>({});
 
+  const MAX_TITLE_LENGTH = 100;
+  
   const validate = () => {
-  const errs: FormErrors = {};
+    const errs: FormErrors = {};
 
-  // Title validation
-  if (!form.title.trim()) errs.title = "Title is required";
-
-  // Date validation
-  if (!form.date) {
-    errs.date = "Date is required";
-  } else {
-    const selectedDate = new Date(form.date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // start of today
-    if (selectedDate < today) {
-      errs.date = "Date cannot be in the past";
+    // Title validation
+    if (!form.title.trim()) {
+      errs.title = "Title is required";
+    } else if (form.title.length > MAX_TITLE_LENGTH) {
+      errs.title = `Title cannot exceed ${MAX_TITLE_LENGTH} characters`;
     }
-  }
 
-  // Time validation
-  if (!form.time) errs.time = "Time is required";
+    // Date & time validation
+    if (!form.date) {
+      errs.date = "Date is required";
+    }
 
-  return errs;
-};
+    if (!form.time) {
+      errs.time = "Time is required";
+    }
+
+    if (form.date && form.time) {
+      const [hours, minutes] = form.time.split(":").map(Number);
+      const [year, month, day] = form.date.split("-").map(Number);
+
+      // Create local date/time
+      const selectedDateTime = new Date(year, month - 1, day, hours, minutes, 0);
+
+      const now = new Date();
+  
+      if (selectedDateTime < now) {
+        errs.date = "Date and time must be in the future";
+      }
+   }
+
+    return errs;
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,15 +65,15 @@ export const AppointmentForm: React.FC = () => {
 
     createMutation.mutate(form, {
       onError: (err: any) => {
-        if (err?.message?.includes("conflict")) {
+        const code = err.code;
+
+        if (code === StatusCode.ALREADY_EXISTS) {
           setErrors({ conflict: "Another appointment exists at that time" });
+        } else if (code === StatusCode.INVALID_ARGUMENT) {
+          setErrors({ conflict: "Invalid input. Please check your data." });
         } else {
           setErrors({ conflict: err.message || "Failed to schedule appointment" });
         }
-      },
-      onSuccess: () => {
-        setForm({ title: "", date: "", time: "" });
-        setErrors({});
       },
     });
   };
@@ -69,12 +84,19 @@ export const AppointmentForm: React.FC = () => {
 
       {errors.conflict && <p className="error conflict">{errors.conflict}</p>}
 
+      {form.title.length > 0 &&
+      <small>
+          {form.title.length}/{MAX_TITLE_LENGTH} characters
+        </small>
+      }
       <input
         type="text"
         placeholder="Title"
         value={form.title}
+        maxLength={MAX_TITLE_LENGTH}
         onChange={(e) => setForm({ ...form, title: e.target.value })}
       />
+       
       {errors.title && <p className="error">{errors.title}</p>}
 
       <input

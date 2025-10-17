@@ -1,9 +1,43 @@
-.appointment-list-container, .appointment-form-container {
+.appointment-list-container, 
+.appointment-form-container {
   font-family: 'Inter', sans-serif;
 }
 
 .appointment-item {
   font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ecf0f1;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  flex-direction: row;
+}
+
+.appointment-item span {
+  font-size: 1rem;
+}
+
+.appointment-delete-btn {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.appointment-delete-btn:hover:not(:disabled) {
+  background: #c0392b;
+}
+
+.appointment-delete-btn:disabled {
+  background: #95a5a6;
+  cursor: not-allowed;
 }
 
 .appointments-container {
@@ -150,6 +184,27 @@
   border-radius: 5px;
 }
 
+.search-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border 0.2s ease;
+}
+
+.search-bar input:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
 @keyframes pulse {
   0% {
     background-color: #f5f5f5;
@@ -162,7 +217,6 @@
   }
 }
 
-/* Responsive */
 @media (max-width: 480px) {
   .appointments-container {
     padding: 0.5rem;
@@ -181,3 +235,5 @@
       display: inline-block;
   }
 }
+
+
