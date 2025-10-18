@@ -153,9 +153,7 @@ make test
 
 ## 🧠 Assumptions & Limitations
 
-- Appointments only use a start time (date + time); no end time is used. This was a deliberate simplification to focus on core features and conflict prevention.
 - All time values stored in UTC.
 - No authentication (out of scope for this assessment).
 - Real-time updates are implemented via gRPC streaming; however, in local testing the stream can occasionally break, especially when creating new appointments. Delete events are generally more stable, as they trigger fewer chunked HTTP responses.
 - Mutex-based synchronization not used in the service layer because it wouldn't provide safety in a multi-instance deployment; proper concurrency control should rely on the database.
-- Limitation: Because appointments only have a start time, overlapping durations cannot be handled, and multi-hour appointments are not supported.

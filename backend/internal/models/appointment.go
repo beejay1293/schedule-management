@@ -1,10 +1,15 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Appointment struct {
-	ID        string    `gorm:"primaryKey"`
+	ID        uuid.UUID `gorm:"primaryKey"`
 	Title     string    `gorm:"not null"`
-	Date      time.Time `gorm:"not null;index"`
+	StartTime time.Time `gorm:"not null;index"`
+	EndTime   time.Time `gorm:"not null;index"`
 	CreatedAt time.Time
 }

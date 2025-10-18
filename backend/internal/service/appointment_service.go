@@ -35,23 +35,28 @@ func NewAppointmentService(repo repository.AppointmentRepository) *AppointmentSe
 // Create Appointment
 // No in-memory mutex here because database-level uniqueness ensures concurrent safety across multiple service instances
 func (s *AppointmentService) CreateAppointment(ctx context.Context, req *pb.CreateAppointmentRequest) (*pb.CreateAppointmentResponse, error) {
-	date, err := time.Parse("2006-01-02 15:04", req.Date+" "+req.Time)
+	start, err := time.Parse("2006-01-02 15:04", req.Date+" "+req.Time)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid date/time format")
 	}
 
-	conflict, err := s.repo.ExistsAt(date)
+	// Add 30 minutes duration for each appointment
+	end := start.Add(30 * time.Minute)
+
+	// pre-check
+	conflict, err := s.repo.ExistsInRange(start, end)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to check existing appointments: %v", err)
 	}
 	if conflict {
-		return nil, status.Error(codes.AlreadyExists, "conflict: another appointment exists at that time")
+		return nil, status.Error(codes.AlreadyExists, "conflict: another appointment overlaps this time range")
 	}
 
 	a := &models.Appointment{
-		ID:    uuid.New().String(),
-		Title: req.Title,
-		Date:  date,
+		ID:        uuid.New(),
+		Title:     req.Title,
+		StartTime: start,
+		EndTime:   end,
 	}
 
 	if err := s.repo.Create(a); err != nil {
@@ -59,10 +64,10 @@ func (s *AppointmentService) CreateAppointment(ctx context.Context, req *pb.Crea
 	}
 
 	pbAppt := &pb.Appointment{
-		Id:    a.ID,
+		Id:    a.ID.String(),
 		Title: a.Title,
-		Date:  a.Date.UTC().Format("2006-01-02"),
-		Time:  a.Date.UTC().Format("15:04"),
+		Date:  a.StartTime.UTC().Format("2006-01-02"),
+		Time:  a.StartTime.UTC().Format("15:04"),
 	}
 
 	s.broadcastEvent(&pb.AppointmentEvent{
@@ -88,10 +93,10 @@ func (s *AppointmentService) DeleteAppointment(ctx context.Context, req *pb.Dele
 	}
 
 	pbAppt := &pb.Appointment{
-		Id:    a.ID,
+		Id:    a.ID.String(),
 		Title: a.Title,
-		Date:  a.Date.UTC().Format("2006-01-02"),
-		Time:  a.Date.UTC().Format("15:04"),
+		Date:  a.StartTime.UTC().Format("2006-01-02"),
+		Time:  a.StartTime.UTC().Format("15:04"),
 	}
 
 	s.broadcastEvent(&pb.AppointmentEvent{
@@ -111,9 +116,9 @@ func (s *AppointmentService) ListAppointments(ctx context.Context, req *pb.ListA
 
 	var pbAppointments []*pb.Appointment
 	for _, a := range appointments {
-		utcDate := a.Date.UTC()
+		utcDate := a.StartTime.UTC()
 		pbAppointments = append(pbAppointments, &pb.Appointment{
-			Id:    a.ID,
+			Id:    a.ID.String(),
 			Title: a.Title,
 			Date:  utcDate.Format("2006-01-02"),
 			Time:  utcDate.Format("15:04"),
@@ -132,9 +137,9 @@ func (s *AppointmentService) SearchAppointments(ctx context.Context, req *pb.Sea
 
 	var pbAppointments []*pb.Appointment
 	for _, a := range appointments {
-		utcDate := a.Date.UTC()
+		utcDate := a.StartTime.UTC()
 		pbAppointments = append(pbAppointments, &pb.Appointment{
-			Id:    a.ID,
+			Id:    a.ID.String(),
 			Title: a.Title,
 			Date:  utcDate.Format("2006-01-02"),
 			Time:  utcDate.Format("15:04"),

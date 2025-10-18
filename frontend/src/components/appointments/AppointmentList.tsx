@@ -131,6 +131,7 @@ export const AppointmentList: React.FC = () => {
                 <h3>{a.title}</h3>
                 <p>
                   {a.date} at {a.time}
+                  <span className="duration-note"> (30 min appointment)</span>
                 </p>
               </div>
               <button
