@@ -10,12 +10,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	google.golang.org/grpc v1.76.0
 	gorm.io/driver/postgres v1.6.0
-	gorm.io/gorm v1.31.0
-)
-
-require (
-	github.com/mattn/go-sqlite3 v1.14.32 // indirect
-	gorm.io/driver/sqlite v1.6.0
+	gorm.io/gorm v1.30.5
 )
 
 require (
