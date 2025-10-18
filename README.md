@@ -153,7 +153,6 @@ make test
 
 ## 🧠 Assumptions & Limitations
 
-- Appointments are validated to prevent overlapping time ranges.
 - Appointments only use a start time (date + time); no end time is used. This was a deliberate simplification to focus on core features and conflict prevention.
 - All time values stored in UTC.
 - No authentication (out of scope for this assessment).
